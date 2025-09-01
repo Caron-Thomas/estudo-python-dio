@@ -68,8 +68,10 @@ while True:
 
     elif opcao == "e":
         print(" extrato ".center(24,"-"))
-        print(extrato)
+        print("Não foram feitas operações até o momento" if not extrato else extrato) # Correção -> Caso nenhuma operação, imprimir saldo vazio 
         print(f'Saldo final da conta: R$ {saldo:.2f}')
+        print("".center(24,"-"))
+
 
     elif opcao == "q":
         break
