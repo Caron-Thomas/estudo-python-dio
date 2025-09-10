@@ -1,12 +1,16 @@
+import re
+
 menu = """
 
 [d] Depositar
 [s] Sacar
 [e] Extrato
 [q] Sair
+[n] Cadastrar Novo Usuário 
 
 => """
 
+usuarios = {}
 saldo = 0
 limite = 500
 extrato = ""
@@ -56,6 +60,36 @@ def imprimir_extrato(saldo,/,*,extrato):
     print(f"\nSaldo: R$ {saldo:.2f}")
     print("================================================")
 
+def criar_novo_usuario():
+    global usuarios
+    endereco = "Endereço não informado"
+    cpf = re.sub(r'\D', '', input("Digite o CPF do novo usuário: \n"))
+    if usuarios.get(cpf) is not None:
+        print("Usuário já foi cadastrado no sistema")
+        return
+    
+    nome = input('Digite o nome completo: \n')
+    data_nascimento = input("Digite a data de nascimento no formato dd/MM/aa :\n")
+
+    if(input("Cadastrar endereço: (S ou N): \n").lower() == "s"):
+        endereco = cadastrar_endereco()
+
+    usuarios[cpf] = {"nome":nome, "data de nascimento": data_nascimento, "endereço": endereco }
+    usuario = usuarios.get(cpf)
+    print(f'Usuário cadastrado com sucesso: \n {usuario}')
+    
+
+    
+def cadastrar_endereco():
+    logradouro = input("Digite o logradouro: \n")
+    nro = ", " + input("Digite o número do imóvel: \n") 
+    bairro = " - " +  input("Digite o bairro: \n") 
+    cidade = input("Digite a cidade: \n")
+    estado = "/" + input("Digite a sigla do estado: \n").upper()
+
+    return logradouro + nro + bairro + " " + cidade + estado
+
+    
 while True:
 
     opcao = input(menu)
@@ -75,6 +109,9 @@ while True:
 
     elif opcao == "e":
         imprimir_extrato(saldo, extrato = extrato)
+
+    elif opcao == "n":
+        criar_novo_usuario();
 
     elif opcao == "q":
         break
