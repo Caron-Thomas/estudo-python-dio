@@ -7,13 +7,16 @@ menu = """
 [e] Extrato
 [q] Sair
 [n] Cadastrar Novo Usuário 
+[c] Cadastrar Nova Conta
 
 => """
 
 usuarios = {}
-saldo = 0
 limite = 500
+saldo = 0
 extrato = ""
+contas_usuarios = []
+conta = 1
 numero_saques = 0
 LIMITE_SAQUES = 3
 
@@ -60,26 +63,30 @@ def imprimir_extrato(saldo,/,*,extrato):
     print(f"\nSaldo: R$ {saldo:.2f}")
     print("================================================")
 
-def criar_novo_usuario():
+def busca_usuario():
     global usuarios
-    endereco = "Endereço não informado"
     cpf = re.sub(r'\D', '', input("Digite o CPF do novo usuário: \n"))
-    if usuarios.get(cpf) is not None:
+    usuario = usuarios.get(cpf)
+    return usuario, cpf
+
+def criar_novo_usuario():
+    endereco = "Endereço não informado"
+    usuario, cpf = busca_usuario()
+    
+    if usuario is not None:
         print("Usuário já foi cadastrado no sistema")
-        return
+        return None
     
     nome = input('Digite o nome completo: \n')
     data_nascimento = input("Digite a data de nascimento no formato dd/MM/aa :\n")
 
     if(input("Cadastrar endereço: (S ou N): \n").lower() == "s"):
         endereco = cadastrar_endereco()
-
-    usuarios[cpf] = {"nome":nome, "data de nascimento": data_nascimento, "endereço": endereco }
-    usuario = usuarios.get(cpf)
-    print(f'Usuário cadastrado com sucesso: \n {usuario}')
     
-
-    
+    usuario = {"nome":nome, "data de nascimento": data_nascimento, "endereço": endereco }
+    print(f'Usuário cpf: {cpf} foi cadastrado com sucesso: \n {usuario}')
+    return cpf, usuario
+      
 def cadastrar_endereco():
     logradouro = input("Digite o logradouro: \n")
     nro = ", " + input("Digite o número do imóvel: \n") 
@@ -89,6 +96,14 @@ def cadastrar_endereco():
 
     return logradouro + nro + bairro + " " + cidade + estado
 
+def criar_nova_conta(*,conta, saldo, extrato,cpf):
+    nova_conta = {"agencia"     : "0001" , 
+                  "numero_conta": conta  ,
+                  "saldo"       : saldo  ,
+                  "extrato"     : extrato,
+                  "cpf"         : cpf     }
+    
+    return nova_conta
     
 while True:
 
@@ -111,7 +126,23 @@ while True:
         imprimir_extrato(saldo, extrato = extrato)
 
     elif opcao == "n":
-        criar_novo_usuario();
+        dados_usuario = criar_novo_usuario()
+        if dados_usuario is not None:
+            cpf, usuario = dados_usuario
+            usuarios[cpf] = usuario
+
+    elif opcao == "c":
+        usuario = busca_usuario()
+        print(usuario)
+        if usuario[0] is None:
+            print("Usuário não localizado")
+
+        else:
+            print("Flubber That!")
+            nova_conta = criar_nova_conta(conta=conta, saldo=saldo, extrato=extrato, cpf=usuario[1]);
+            contas_usuarios.append(nova_conta)
+            print(contas_usuarios)
+            conta += 1
 
     elif opcao == "q":
         break
